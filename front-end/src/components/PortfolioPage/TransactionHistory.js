@@ -27,7 +27,7 @@ function TransactionHistory() {
       <th scope="col">Transaction Id</th>
       <th scope="col">Buyer</th>
       <th scope="col">Buyer Id</th>
-      <th scope="col">Stocks Quantity</th>
+      <th scope="col">Stocks</th>
       <th scope="col">Seller</th>
       <th scope="col">Seller Id</th>
     </tr>

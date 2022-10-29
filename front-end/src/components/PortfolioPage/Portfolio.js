@@ -9,14 +9,14 @@ function Portfolio() {
   return (
     <div>
       <div className="PortfolioContainer">
-        <div className='PortfolioGraphs' style={{backgroundColor:"#FAF7F0"}}>
+        <div className='PortfolioGraphs'>
             <PortfolioGraph />
         </div>
-        <div style={{backgroundColor:"aliceblue", height:"60vh"}}>
+        <div className='Port-User-Portfolio'>
             <PortUserPortfolio />
         </div>
         
-        <div style={{backgroundColor:"antiquewhite", height:"38vh"}}>
+        <div className='Portfolio-Transaction-History'>
             <TransactionHistory />
         </div>
         <div className='BuyorSellButton'>
