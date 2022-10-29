@@ -106,6 +106,23 @@ const placeSellOrder = async (req, res) => {
     console.log(req.body.min_selling_price);
     if(req.body.min_selling_price === -1) {
         // market order
+        let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.limits;`
+        const [buylimit] = await db.execute(sql_query, []);
+        ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order} = buylimit[0]);
+        console.log(max_buying_price)
+        if(max_buying_price === -1) {
+            return res.status(404).json({
+                code: -3,
+                msg: 'No buyers available at the moment'
+            });
+        }
+        else {
+            // transaction
+                // buyers deletion
+                console.log('transaction takes place');
+                const response = await buyerDeletion({max_buyer_row_order, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price});
+                return res.status(response.status).send(response.msg);
+        }
     }
     else {
         // limit order
@@ -116,7 +133,10 @@ const placeSellOrder = async (req, res) => {
             ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order} = buylimit[0]);
             console.log(max_buying_price)
             if(max_buying_price === -1) {
-
+                // seller book update
+                console.log('seller book update called');
+                const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id});
+                return res.status(response.status).send(response.msg);
             } 
             else if(max_buying_price < req.body.min_selling_price) {
                 // seller book update
@@ -131,7 +151,6 @@ const placeSellOrder = async (req, res) => {
                     const response = await buyerDeletion({max_buyer_row_order, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price});
                     return res.status(response.status).send(response.msg);
             }
-            return res.send('working')
     }
 }
 
