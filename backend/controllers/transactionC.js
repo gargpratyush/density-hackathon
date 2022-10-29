@@ -6,6 +6,135 @@ const getTransactionHistory = async (req, res) => {
     res.json(transactions);
 }
 
+const placeBuyOrder = async (req, res) => {
+    console.log('working')
+}
+
+const transaction_update = async (props) => {
+    sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.transaction_history(seller_id, stocks_quantity, buyer_id, final_price) VALUES (${props.seller_id}, ${props.stocks_transaction}, ${props.buyer_id} ,${props.final_price});`;
+    await db.execute(sql_query, []);
+
+    sql_query = `UPDATE ${process.env.MYSQLDATABASE}.users SET stocks = stocks + ${props.stocks_transaction}, balance = balance - ${props.stocks_transaction*props.final_price} WHERE user_id = ${props.buyer_id};`;
+    await db.execute(sql_query, []);
+
+    sql_query = `UPDATE ${process.env.MYSQLDATABASE}.users SET stocks = stocks - ${props.stocks_transaction}, balance = balance + ${props.stocks_transaction*props.final_price} WHERE user_id = ${props.seller_id};`;
+    await db.execute(sql_query, []);
+}
+
+const buyerDeletion = async (props) => {
+    let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE row_order = ${props.max_buyer_row_order};`;
+    var [toBeDeletedRow] = await db.execute(sql_query, []);
+    console.log(toBeDeletedRow)
+    var stocksRemaining = props.current_stock;
+    var max_buyer_row_order = props.max_buyer_row_order;
+    while(stocksRemaining > 0) {
+        if(stocksRemaining == toBeDeletedRow[0].stocks_quantity) {
+            sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
+            await db.execute(sql_query, []);
+            
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: props.min_selling_price, });
+            
+            max_buyer_row_order++;
+            
+            sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE row_order = ${max_buyer_row_order};`;
+            [toBeDeletedRow] = await db.execute(sql_query, []);
+            
+            sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_buyer_row_order = ${max_buyer_row_order}, max_buying_price = ${toBeDeletedRow[0].max_buying_price};`;
+            await db.execute(sql_query, []);
+
+            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
+            break;
+        }
+        else if(stocksRemaining < toBeDeletedRow[0].stocks_quantity) {
+            sql_query = `UPDATE ${process.env.MYSQLDATABASE}.buy_order_book SET stocks_quantity = stocks_quantity - ${stocksRemaining} WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
+            await db.execute(sql_query, []);
+
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: props.min_selling_price });
+
+            break;
+        }
+        else {
+            sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
+            await db.execute(sql_query, []);
+
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: toBeDeletedRow[0].stocks_quantity, final_price: props.min_selling_price, });
+
+            max_buyer_row_order++;
+            
+            sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE row_order = ${max_buyer_row_order};`;
+            [toBeDeletedRow] = await db.execute(sql_query, []);
+            
+            sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_buyer_row_order = ${max_buyer_row_order}, max_buying_price = ${toBeDeletedRow[0].max_buying_price};`;
+            await db.execute(sql_query, []);
+            
+            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
+        }
+    }
+
+    return ({
+        status: 200,
+        msg: 'Order Placed!'
+    });
+}
+
+const sellerBookUpdate = async (props) => {
+    let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE min_selling_price>${props.current_selling_price} LIMIT 1;`;
+    const [just_greater_row] = await db.execute(sql_query, []);
+    if(just_greater_row.length === 0) {
+        sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.sell_order_book(seller_id, min_selling_price, row_order, stocks_quantity) VALUES (${props.seller_id}, ${props.current_selling_price}, ${props.max_seller_row_order + 1}, ${props.stocks_quantity});`;
+        const [newRow3] = await db.execute(sql_query, []);
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_seller_row_order = max_seller_row_order+1;`;
+        const [updatedRows2] = await db.execute(sql_query, []);
+    }
+    else if(just_greater_row[0].row_order === props.min_seller_row_order) {
+        sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.sell_order_book(seller_id, min_selling_price, row_order, stocks_quantity) VALUES (${props.seller_id}, ${props.current_selling_price}, ${props.min_seller_row_order - 1}, ${props.stocks_quantity});`;
+        const [newRow] = await db.execute(sql_query, []);
+    }
+    else {
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.sell_order_book SET row_order=row_order+1 WHERE row_order>=${just_greater_row[0].row_order};`;
+        const [updatedRows] = await db.execute(sql_query, []);
+        sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.sell_order_book(seller_id, min_selling_price, row_order, stocks_quantity) VALUES (${props.seller_id}, ${props.current_selling_price}, ${just_greater_row[0].row_order}, ${props.stocks_quantity});`;
+        const [newRow2] = await db.execute(sql_query, []);
+    }
+    return ({
+        status: 200,
+        msg: 'Order Placed!'
+    });
+}
+
+const placeSellOrder = async (req, res) => {
+    console.log(req.body.min_selling_price);
+    if(req.body.min_selling_price === -1) {
+        // market order
+    }
+    else {
+        // limit order
+            console.log('workworkwork')
+            // compare with max-buy-price in limit table
+            let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.limits;`
+            const [buylimit] = await db.execute(sql_query, []);
+            ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order} = buylimit[0]);
+            console.log(max_buying_price)
+            if(max_buying_price === -1) {
+
+            } 
+            else if(max_buying_price < req.body.min_selling_price) {
+                // seller book update
+                console.log('seller book update called');
+                const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id});
+                return res.status(response.status).send(response.msg);
+            }
+            else {
+                // transaction
+                    // buyers deletion
+                    console.log('transaction takes place');
+                    const response = await buyerDeletion({max_buyer_row_order, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price});
+                    return res.status(response.status).send(response.msg);
+            }
+            return res.send('working')
+    }
+}
+
 module.exports = {
-    getTransactionHistory
+    getTransactionHistory, placeBuyOrder, placeSellOrder
 }
