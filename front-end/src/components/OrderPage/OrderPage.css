@@ -1,0 +1,7 @@
+.oderPage{
+    display: flex;
+}
+.Orderbook{
+    width:70vw;
+    background-color: aliceblue;
+}
