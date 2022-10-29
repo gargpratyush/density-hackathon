@@ -5,7 +5,7 @@ const app = express();
 // Routes
 const userRoute = require('./routes/userRoutes')
 const orderBookRoute = require('./routes/orderBookRoutes')
-
+const transactionRoute = require('./routes/transactionRoutes')
 
 
 app.use(express.json())
@@ -13,6 +13,8 @@ app.use(express.json())
 app.use('/users', userRoute);
 
 app.use('/book', orderBookRoute);
+
+app.use('/transaction', transactionRoute);
 
 app.get(`/health`, (req, res) => {
     res.send(`User App Running at port : ${port}`);
