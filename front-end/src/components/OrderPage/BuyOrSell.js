@@ -63,7 +63,7 @@ function BuyOrSell() {
     }
   }
   return (
-    <div>
+    <div className='BUY-OR-SELL'>
       <div className="Buy-OR-Sell">
       <select id='buyorsell' onChange={()=>{changeTransactionType()}} className="form-select" aria-label="Default select example">
         <option selected>Buy OR Sell</option>
@@ -89,14 +89,14 @@ function BuyOrSell() {
       </div>
       <div className='Stock/Price'>
         <div>
-      <input className="form-control" type="text" value={StockAmount} onChange={(e) => setStockAmount(e.target.value)}  placeholder="Stock Amount" aria-label="default input example"></input></div>
+      <input className="form-control Stock-Amount-Input" type="text" value={StockAmount} onChange={(e) => setStockAmount(e.target.value)}  placeholder="Stock Amount" aria-label="default input example"></input></div>
       <div>
       {orderType === "Limit" ? 
-      <input className="form-control" type="text" value={PriceLim} onChange={(e) => setPriceLim(e.target.value)} placeholder="Price" aria-label="default input example">
+      <input className="form-control Price-Limit-Input" type="text" value={PriceLim} onChange={(e) => setPriceLim(e.target.value)} placeholder="Price" aria-label="default input example">
       </input> : ""}</div>
       
       </div>
-      <button onClick={handleBuySell} type="button" className="btn btn-success">Place order</button>
+      <button onClick={handleBuySell} type="button" className="btn btn-success Place-Order-Button">Place order</button>
     </div>
   )
 }

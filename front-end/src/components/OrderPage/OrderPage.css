@@ -2,6 +2,9 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    background-color: black;
+    height:100vh;
+    width:100vw;
 }
 .Orderbook{
     width:60vw;
@@ -25,3 +28,23 @@
 .SellRed{
     color:Red;
 }
+.BUY-OR-SELL{
+    width:30vw;
+    border-radius: 10px;
+    background-color: rgb(46, 45, 45);
+    color:greenyellow;
+    height:50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+#buyorsell,#IdforselectUser, #OrderType, .Stock-Amount-Input, .Price-Limit-Input, .Place-Order-Button{
+    border-radius: 10px;
+    font-size: 1.05rem;
+    padding:10px;
+    color:greenyellow;
+    background-color: black;
+    font-weight: bold;
+}
+
