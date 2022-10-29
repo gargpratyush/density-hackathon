@@ -1,8 +1,7 @@
-import PortfolioGraph from "./components/PortfolioPage/PortfolioGraph";
-import PortUserPortfolio from "./components/PortfolioPage/PortUserPortfolio";
-
 import React, { useEffect, useState} from 'react';
-
+import Portfolio from "./components/PortfolioPage/Portfolio";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import OrderPage from './components/OrderPage/OrderPage';
 
 function App() {
 
@@ -20,7 +19,13 @@ function App() {
 
   return (
     <div className="App">
-      <PortfolioGraph />
+      <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Portfolio />} />
+        <Route path='/order' element={<OrderPage />} />
+      </Routes>
+      </BrowserRouter>
+      
     </div>
   );
 }

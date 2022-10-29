@@ -29,7 +29,8 @@ function PortfolioGraph() {
     
   return (
     <div>
-        <canvas id="myChart" width="500px" height="500px"><Line options={options} data={data}/></canvas>
+      Grap
+        {/* <canvas id="myChart" width="500px" height="500px"><Line options={} data={}/></canvas> */}
         
     </div>
   )
