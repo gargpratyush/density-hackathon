@@ -79,12 +79,16 @@ const buyerBookUpdate = async (props) => {
     else if(just_lesser_row[0].row_order === props.max_buyer_row_order) {
         sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.buy_order_book(buyer_id, max_buying_price, row_order, stocks_quantity) VALUES (${props.buyer_id}, ${props.current_buying_price}, ${props.max_buyer_row_order - 1}, ${props.stocks_quantity});`;
         const [newRow] = await db.execute(sql_query, []);
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_buyer_row_order = max_buyer_row_order-1, max_buying_price = ${props.current_buying_price};`;
+        const [updatedRows2] = await db.execute(sql_query, []);
     }
     else {
         sql_query = `UPDATE ${process.env.MYSQLDATABASE}.buy_order_book SET row_order=row_order+1 WHERE row_order>=${just_lesser_row[0].row_order};`;
         const [updatedRows] = await db.execute(sql_query, []);
         sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.buy_order_book(buyer_id, max_buying_price, row_order, stocks_quantity) VALUES (${props.buyer_id}, ${props.current_buying_price}, ${just_lesser_row[0].row_order}, ${props.stocks_quantity});`;
         const [newRow2] = await db.execute(sql_query, []);
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_buyer_row_order = min_buyer_row_order+1;`;
+        const [updatedRows2] = await db.execute(sql_query, []);
     }
     return ({
         status: 200,
