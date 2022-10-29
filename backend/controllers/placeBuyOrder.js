@@ -79,6 +79,10 @@ const sellerDeletion = async (props) => {
                 flag = 1;
                 break;
             }
+            if (toBeDeletedRow[0].min_selling_price>props.current_buying_price){
+                flag = 1;
+                break;
+            }
             
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = ${min_seller_row_order}, min_selling_price = ${toBeDeletedRow[0].min_selling_price};`;
             await db.execute(sql_query, []);

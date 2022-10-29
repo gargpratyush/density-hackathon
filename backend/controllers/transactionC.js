@@ -87,6 +87,11 @@ const buyerDeletion = async (props) => {
                 break;
             }
 
+            if (toBeDeletedRow[0].max_buying_price<props.current_selling_price){
+                flag = 1;
+                break;
+            }
+
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_buyer_row_order = ${max_buyer_row_order}, max_buying_price = ${toBeDeletedRow[0].max_buying_price};`;
             await db.execute(sql_query, []);
             
