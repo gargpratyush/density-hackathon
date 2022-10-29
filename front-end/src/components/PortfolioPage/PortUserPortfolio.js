@@ -1,18 +1,20 @@
-import PortfolioGraph from './PortfolioGraph';
 import './PortUserPortfolio.css';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function PortUserPortfolio() {
   const [users, setUsers] = useState([]);
-  axios.get("/users")
-  .then((response)=>{
-    console.log(response.data);
-    setUsers(response.data);
-  })
-  .catch((err)=>{
-    console.log(err);
-  })
+  
+  useEffect(() => {
+    axios.get("/users")
+      .then((response)=>{
+        console.log(response.data);
+        setUsers(response.data);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+  }, [])
   return (
     <div className='portuserportfolio'>
       <div className="currentmarketprice">

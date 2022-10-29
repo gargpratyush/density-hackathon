@@ -9,7 +9,7 @@ function Portfolio() {
   return (
     <div>
       <div className="PortfolioContainer">
-        <div style={{backgroundColor:"powderblue", height:"60vh"}}>
+        <div style={{backgroundColor:"#FAF7F0", height:"60vh"}}>
             <PortfolioGraph />
         </div>
         <div style={{backgroundColor:"aliceblue", height:"60vh"}}>
