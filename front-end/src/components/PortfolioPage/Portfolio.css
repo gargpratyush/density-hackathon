@@ -51,9 +51,20 @@
     margin-top: 0;
     border: 2px solid grey;
     background-color: rgb(46, 45, 45);
+    overflow-y: scroll;
     height:38vh;
     width:65vw;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+  color: white;
+  
+}
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
 .PortfolioTransactionHistory{
     grid-row: 2/ span 2;
 }

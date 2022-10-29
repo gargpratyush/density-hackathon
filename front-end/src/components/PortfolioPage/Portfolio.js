@@ -20,7 +20,7 @@ function Portfolio() {
             <TransactionHistory />
         </div>
         <div className='BuyorSellButton'>
-            <Link to="/order">Buy OR Sell</Link>
+            <Link to="/order">Buy/Sell Stocks</Link>
         </div>
       </div>
     </div>
