@@ -3,16 +3,19 @@ import{
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
+    BarElement,
     LineElement,
     Title,
     Tooltip,
     Legend
 } from 'chart.js'
-import {Line} from 'react-chartjs-2'
-
+// import {Bar} from 'react-chartjs-2'
+// import {Chart} from 'chart.js';
+import {Line} from 'react-chartjs-2';
 ChartJS.register(
     CategoryScale,
     LinearScale,
+    BarElement,
     LineElement,
     Title,
     Tooltip,
@@ -22,38 +25,13 @@ ChartJS.register(
 
 
 function PortfolioGraph() {
-    const [chartData, setChartData] = useState({datasets:[]})
-    const [chartOptions, setChartOptions] = useState({})
-    useEffect(()=>{
-        setChartData({
-            labels:["a,b,c,d,e"],
-            datasets:[
-                {
-                    label:"qwertyui",
-                    data:[10,40,60,90,170],
-                    borderColor:"red",
-                    backgroundColor:"green"
-                }
-            ]
-        });
-        setChartOptions({
-            responsive:true,
-            plugins:{
-                legends:{
-                    position:"top"
-                },
-                title:{
-                    display:true,
-                    text:"sdfghj"
-                }
-            }
-
-            
-        })
-    })
+  
+    
   return (
     <div>
-        <Line options={chartOptions} data={chartData}/>
+      Grap
+        {/* <canvas id="myChart" width="500px" height="500px"><Line options={} data={}/></canvas> */}
+        
     </div>
   )
 }
