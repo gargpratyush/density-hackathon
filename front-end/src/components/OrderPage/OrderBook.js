@@ -1,11 +1,9 @@
 import axios from 'axios'
 import React from 'react'
 import { useEffect } from 'react'
-import UserContext from '../../Context/UserContext';
-import { useState,useContext } from 'react';
+import { useState } from 'react';
 
 function OrderBook() {
-    const usercontext = useContext(UserContext);
     const [orderBuy, setOrderBuy] = useState([]);
     const [orderSell, setOrderSell] = useState([]);
     useEffect(()=>{

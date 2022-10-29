@@ -39,14 +39,14 @@ function TransactionHistory() {
                 <th scope="row">{transaction.transaction_id}</th>
                     {
                         users.map(user => (
-                            user.user_id == transaction.buyer_id ? <td>{user.user_name}</td> : ""
+                            user.user_id === transaction.buyer_id ? <td>{user.user_name}</td> : ""
                         ))
                     }
                 <td>{transaction.buyer_id}</td>
                 <td>{transaction.stocks_quantity}</td>
                 {
                     users.map(user => (
-                        user.user_id == transaction.seller_id ? <td>{user.user_name}</td> : ""
+                        user.user_id === transaction.seller_id ? <td>{user.user_name}</td> : ""
                     ))
                 }
                 <td>{transaction.seller_id}</td>

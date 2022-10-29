@@ -14,7 +14,7 @@ function PortUserPortfolio() {
     .then((response)=>{
       console.log("qwer")
       console.log(response.data[0].final_price);
-      response.data.map(transaction => {
+      response.data.forEach(transaction => {
         setCurrMarketPrice(transaction.final_price);
       })
     })

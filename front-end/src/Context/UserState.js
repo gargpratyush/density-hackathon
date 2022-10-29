@@ -6,7 +6,6 @@ import axios from 'axios';
 const UserState = (props) => {
     const [users, setUsers] = useState([]);
     const [transactions, setTransactions] = useState([]);
-    const [order, setOrder] = useState([]);
 
 
     useEffect(() => {
@@ -28,7 +27,7 @@ const UserState = (props) => {
     }, [])
 
   return (
-    <UserContext.Provider value={{users}}>
+    <UserContext.Provider value={{users, transactions}}>
                   {props.children}
     </UserContext.Provider>
   )
