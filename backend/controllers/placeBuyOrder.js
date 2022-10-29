@@ -17,25 +17,40 @@ const sellerDeletion = async (props) => {
     console.log(toBeDeletedRow)
     var stocksRemaining = props.current_stock;
     var min_seller_row_order = props.min_seller_row_order;
+    var flag = 0;
     while(stocksRemaining > 0) {
-        // if(toBeDeletedRow.length === 0) {
-        //     break;
-        // }
+        console.log('hi')
+        console.log(stocksRemaining, min_seller_row_order)
+        console.log(toBeDeletedRow)
+        
+        if(toBeDeletedRow.length === 0) {
+            sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = 0, min_selling_price = -1;`;
+            await db.execute(sql_query, []);
+            flag = 1;
+            break;
+        }
         if(stocksRemaining == toBeDeletedRow[0].stocks_quantity) {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE sell_order_id = ${toBeDeletedRow[0].sell_order_id};`;
             await db.execute(sql_query, []);
             
             transaction_update({seller_id: toBeDeletedRow[0].seller_id, buyer_id: props.buyer_id, stocks_transaction: stocksRemaining, final_price: props.min_selling_price, });
+            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
             
             min_seller_row_order++;
             
             sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE row_order = ${min_seller_row_order};`;
             [toBeDeletedRow] = await db.execute(sql_query, []);
+
+            if(toBeDeletedRow.length === 0) {
+                sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = 0, min_selling_price = -1;`;
+                await db.execute(sql_query, []);
+                flag = 1;
+                break;
+            }
             
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = ${min_seller_row_order}, min_selling_price = ${toBeDeletedRow[0].min_selling_price};`;
             await db.execute(sql_query, []);
 
-            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
             break;
         }
         else if(stocksRemaining < toBeDeletedRow[0].stocks_quantity) {
@@ -51,22 +66,29 @@ const sellerDeletion = async (props) => {
             await db.execute(sql_query, []);
 
             transaction_update({seller_id: toBeDeletedRow[0].seller_id, buyer_id: props.buyer_id, stocks_transaction: toBeDeletedRow[0].stocks_quantity, final_price: props.min_selling_price, });
+            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
 
             min_seller_row_order++;
             
             sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE row_order = ${min_seller_row_order};`;
             [toBeDeletedRow] = await db.execute(sql_query, []);
+
+            if(toBeDeletedRow.length === 0) {
+                sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = 0, min_selling_price = -1;`;
+                await db.execute(sql_query, []);
+                flag = 1;
+                break;
+            }
             
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = ${min_seller_row_order}, min_selling_price = ${toBeDeletedRow[0].min_selling_price};`;
             await db.execute(sql_query, []);
             
-            stocksRemaining = stocksRemaining - toBeDeletedRow[0].stocks_quantity;
         }
     }
 
-    // if(stocksRemaining>0) {
-    //     const response = await buyerBookUpdate({current_buying_price :req.body.max_buying_price, max_buyer_row_order, min_buyer_row_order, stocks_quantity: stocksRemaining, buyer_id: req.body.buyer_id});
-    // }
+    if(stocksRemaining>0 && flag == 1) {
+        const response = await buyerBookUpdate({current_buying_price: props.current_buying_price, max_buyer_row_order, min_buyer_row_order, stocks_quantity: stocksRemaining, buyer_id: props.buyer_id});
+    }
 
     return ({
         status: 200,
@@ -119,9 +141,9 @@ const placeBuyOrder = async (req, res) => {
         }
         else {
             // transaction
-                // buyers deletion
+                // sellers deletion
                 console.log('transaction takes place');
-                const response = await sellerDeletion({min_seller_row_order, current_stock: req.body.stocks_quantity, buyer_id: req.body.buyer_id, min_selling_price, max_buying_price});
+                const response = await sellerDeletion({min_seller_row_order, current_stock: req.body.stocks_quantity, buyer_id: req.body.buyer_id, min_selling_price, max_buying_price, current_buying_price :req.body.max_buying_price});
                 return res.status(response.status).send(response.msg);
         }
     }
@@ -149,10 +171,9 @@ const placeBuyOrder = async (req, res) => {
                 // transaction
                     // buyers deletion
                     console.log('transaction takes place');
-                    const response = await sellerDeletion({min_seller_row_order, current_stock: req.body.stocks_quantity, buyer_id: req.body.buyer_id, min_selling_price, max_buying_price});
+                    const response = await sellerDeletion({min_seller_row_order, current_stock: req.body.stocks_quantity, buyer_id: req.body.buyer_id, min_selling_price, max_buying_price, current_buying_price :req.body.max_buying_price});
                     return res.status(response.status).send(response.msg);
             }
-            return res.send('working')
     }
 }
 
