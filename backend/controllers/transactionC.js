@@ -22,6 +22,7 @@ const transaction_update = async (props) => {
 }
 
 const buyerDeletion = async (props) => {
+    const final_price_setter = props.isLimitOrder === 1 ? props.current_selling_price : props.max_buying_price;
     let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE row_order = ${props.max_buyer_row_order};`;
     var [toBeDeletedRow] = await db.execute(sql_query, []);
     console.log(toBeDeletedRow)
@@ -32,7 +33,7 @@ const buyerDeletion = async (props) => {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
             await db.execute(sql_query, []);
             
-            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: props.min_selling_price, });
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: final_price_setter, });
             
             max_buyer_row_order++;
             
@@ -49,7 +50,7 @@ const buyerDeletion = async (props) => {
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.buy_order_book SET stocks_quantity = stocks_quantity - ${stocksRemaining} WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
             await db.execute(sql_query, []);
 
-            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: props.min_selling_price });
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: stocksRemaining, final_price: final_price_setter });
 
             break;
         }
@@ -57,7 +58,7 @@ const buyerDeletion = async (props) => {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
             await db.execute(sql_query, []);
 
-            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: toBeDeletedRow[0].stocks_quantity, final_price: props.min_selling_price, });
+            transaction_update({seller_id: props.seller_id, buyer_id: toBeDeletedRow[0].buyer_id, stocks_transaction: toBeDeletedRow[0].stocks_quantity, final_price: final_price_setter, });
 
             max_buyer_row_order++;
             
@@ -89,12 +90,16 @@ const sellerBookUpdate = async (props) => {
     else if(just_greater_row[0].row_order === props.min_seller_row_order) {
         sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.sell_order_book(seller_id, min_selling_price, row_order, stocks_quantity) VALUES (${props.seller_id}, ${props.current_selling_price}, ${props.min_seller_row_order - 1}, ${props.stocks_quantity});`;
         const [newRow] = await db.execute(sql_query, []);
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET min_seller_row_order = min_seller_row_order-1, min_selling_price = ${props.current_selling_price};`;
+        const [updatedRows2] = await db.execute(sql_query, []);
     }
     else {
         sql_query = `UPDATE ${process.env.MYSQLDATABASE}.sell_order_book SET row_order=row_order+1 WHERE row_order>=${just_greater_row[0].row_order};`;
         const [updatedRows] = await db.execute(sql_query, []);
         sql_query = `INSERT INTO ${process.env.MYSQLDATABASE}.sell_order_book(seller_id, min_selling_price, row_order, stocks_quantity) VALUES (${props.seller_id}, ${props.current_selling_price}, ${just_greater_row[0].row_order}, ${props.stocks_quantity});`;
         const [newRow2] = await db.execute(sql_query, []);
+        sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_seller_row_order = max_seller_row_order+1;`;
+        const [updatedRows3] = await db.execute(sql_query, []);
     }
     return ({
         status: 200,
@@ -120,7 +125,7 @@ const placeSellOrder = async (req, res) => {
             // transaction
                 // buyers deletion
                 console.log('transaction takes place');
-                const response = await buyerDeletion({max_buyer_row_order, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price});
+                const response = await buyerDeletion({max_buyer_row_order, max_buying_price, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price, isLimitOrder: 0, current_selling_price :req.body.min_selling_price});
                 return res.status(response.status).send(response.msg);
         }
     }
@@ -135,7 +140,7 @@ const placeSellOrder = async (req, res) => {
             if(max_buying_price === -1) {
                 // seller book update
                 console.log('seller book update called');
-                const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id});
+                const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id, });
                 return res.status(response.status).send(response.msg);
             } 
             else if(max_buying_price < req.body.min_selling_price) {
@@ -148,7 +153,7 @@ const placeSellOrder = async (req, res) => {
                 // transaction
                     // buyers deletion
                     console.log('transaction takes place');
-                    const response = await buyerDeletion({max_buyer_row_order, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price});
+                    const response = await buyerDeletion({max_buyer_row_order, max_buying_price, current_stock: req.body.stocks_quantity, seller_id: req.body.seller_id, min_selling_price, isLimitOrder: 1, current_selling_price :req.body.min_selling_price});
                     return res.status(response.status).send(response.msg);
             }
     }
