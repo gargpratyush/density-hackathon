@@ -1,7 +1,7 @@
 {
   "name": "team-flexbox",
   "version": "0.1.0",
-  "proxy": "https://api.flexbox.chiragghosh.me/",
+  "proxy": "http://127.0.0.1:5001/",
   "private": true,
   "dependencies": {
     "@nivo/core": "^0.80.0",

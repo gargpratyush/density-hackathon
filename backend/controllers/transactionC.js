@@ -121,7 +121,7 @@ const placeSellOrder = async (req, res) => {
         // market order
         let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.limits;`
         const [buylimit] = await db.execute(sql_query, []);
-        ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order} = buylimit[0]);
+        ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order, min_buyer_row_order} = buylimit[0]);
         console.log(max_buying_price)
         if(max_buying_price === -1) {
             return res.status(404).json({
@@ -143,7 +143,7 @@ const placeSellOrder = async (req, res) => {
             // compare with max-buy-price in limit table
             let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.limits;`
             const [buylimit] = await db.execute(sql_query, []);
-            ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order} = buylimit[0]);
+            ({max_buying_price, max_buyer_row_order, min_selling_price, min_seller_row_order, max_seller_row_order, min_buyer_row_order} = buylimit[0]);
             console.log(max_buying_price)
             if(max_buying_price === -1) {
                 // seller book update
