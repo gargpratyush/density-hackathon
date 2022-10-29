@@ -5,7 +5,9 @@ import axios from 'axios';
 
 const UserState = (props) => {
     const [users, setUsers] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [order, setOrder] = useState([]);
+
 
     useEffect(() => {
         axios.get("/users")
@@ -14,7 +16,15 @@ const UserState = (props) => {
             })
             .catch((err)=>{
             console.log(err);
-            });
+    });
+
+    axios.get('/transaction/history')
+    .then((res2)=> {
+      setTransactions(res2.data);
+      })
+    .catch(err => {
+      console.log(err)
+    });
     }, [])
 
   return (

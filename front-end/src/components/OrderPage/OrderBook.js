@@ -31,7 +31,7 @@ function OrderBook() {
     <div className='Orderbook'>
         <div className='Order-Book-Buy'>
             <div className='BuyGreen'>Buy</div>
-      <table class="table table-bordered border-success">
+      <table className="table table-bordered border-success">
   <thead>
     <tr >
       <th scope="col" style={{borderBottom:"2px solid green"}}>Quantity</th>
@@ -52,7 +52,7 @@ function OrderBook() {
 </div>
 <div className="Order-Book-Sell">
 <div className='SellRed'>Sell</div>
-<table class="table">
+<table className="table">
   <thead>
     <tr>
       <th scope="col" style={{borderBottom:"2px solid red"}}>Quantity</th>
