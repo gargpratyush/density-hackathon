@@ -22,6 +22,7 @@ function App() {
       <BrowserRouter>
       <Routes>
         <Route path='/' element={<Portfolio />} />
+        <Route path='/home' element={<Portfolio />} />
         <Route path='/order' element={<OrderPage />} />
       </Routes>
       </BrowserRouter>
