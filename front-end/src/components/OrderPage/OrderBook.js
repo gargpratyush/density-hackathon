@@ -1,29 +1,10 @@
-import axios from 'axios'
 import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react';
+import UserContext from '../../Context/UserContext';
+import { useContext } from 'react';
 
 function OrderBook() {
-    const [orderBuy, setOrderBuy] = useState([]);
-    const [orderSell, setOrderSell] = useState([]);
-    useEffect(()=>{
-        axios.get("/book/buy")
-        .then(res1 => {
-            console.log(res1.data);
-            setOrderBuy(res1.data)
-        })
-        .catch(err => {
-            console.log(err);
-        });
-
-        axios.get('/book/sell')
-        .then(res2 => {
-            setOrderSell(res2.data)
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    },[])
+    const usercontext = useContext(UserContext);
+    const {orderBuy, orderSell} = usercontext;
 
   return (
     <div className='Orderbook'>
