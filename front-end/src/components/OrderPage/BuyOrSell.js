@@ -7,7 +7,7 @@ import axios from 'axios';
 
 function BuyOrSell() {
   const usercontext = useContext(UserContext);
-  const {users} = usercontext;
+  const {users, updateAll} = usercontext;
   const [transactionType, setTransactionType] = useState();
   const [orderType, setOrderType] = useState("Market");
   const [user, setUser] = useState();
@@ -29,8 +29,32 @@ function BuyOrSell() {
     else if(!StockAmount) toast.info('Please provide a stock amount.')
     else {
       if(transactionType === 'Buy') {
-        axios.post('transaction/place/buy', {})
-          .then((response) => toast.success('TRansaction Successful'))
+        const data = {
+          buyer_id: user,
+          max_buying_price: orderType === 'Limit' ? PriceLim : -1,
+          stocks_quantity: StockAmount
+        }
+        axios.post('transaction/place/buy', data)
+          .then(() => {
+            toast.success('Transaction Successful')
+            updateAll()
+          })
+          .catch((error) => {
+            toast.error(error.response.data.msg)
+            console.log(error);
+          })
+      }
+      else {
+        const data = {
+          seller_id: user,
+          min_selling_price: orderType === 'Limit' ? PriceLim : -1,
+          stocks_quantity: StockAmount
+        }
+        axios.post('transaction/place/buy', data)
+          .then(() => {
+            toast.success('Transaction Successful')
+            updateAll()
+          })
           .catch((error) => {
             toast.error('An error occured')
             console.log(error);
