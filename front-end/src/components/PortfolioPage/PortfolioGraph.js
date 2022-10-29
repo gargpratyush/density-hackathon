@@ -25,7 +25,7 @@ ChartJS.register(
 
 
 function PortfolioGraph() {
-    const CHART = 
+  
     
   return (
     <div>
