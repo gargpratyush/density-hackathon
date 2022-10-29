@@ -1,4 +1,3 @@
-import PortfolioGraph from './PortfolioGraph';
 import './PortUserPortfolio.css';
 import axios from 'axios';
 import { useState } from 'react';
@@ -16,9 +15,9 @@ function PortUserPortfolio() {
         Current Market price :
       </div>      
       <div className='userportfolio'>
-          <table class="table table-info table-striped-columns">
+          <table className="table table-info table-striped-columns">
       <thead>
-        <tr class="table-info">
+        <tr className="table-info">
           <th scope="col">Username</th>
           <th scope="col">Stocks</th>
           <th scope="col">Fiat $</th>
@@ -28,10 +27,10 @@ function PortUserPortfolio() {
         {
           users.map((user) => (
             
-              <tr class="table-info">
-                <td class="table-info">{user.user_name}</td>
-                <td class="table-info">{user.stocks}</td>
-                <td class="table-info">{user.balance}</td>
+              <tr key={user.user_id} className="table-info">
+                <td className="table-info">{user.user_name}</td>
+                <td className="table-info">{user.stocks}</td>
+                <td className="table-info">{user.balance}</td>
         </tr>
           
           ))
