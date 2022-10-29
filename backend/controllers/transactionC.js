@@ -29,9 +29,9 @@ const buyerDeletion = async (props) => {
     var stocksRemaining = props.current_stock;
     var max_buyer_row_order = props.max_buyer_row_order;
     while(stocksRemaining > 0) {
-        if(toBeDeletedRow.length === 0) {
-            break;
-        }
+        // if(toBeDeletedRow.length === 0) {
+        //     break;
+        // }
         if(stocksRemaining == toBeDeletedRow[0].stocks_quantity) {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
             await db.execute(sql_query, []);
@@ -75,9 +75,9 @@ const buyerDeletion = async (props) => {
         }
     }
 
-    if(stocksRemaining>0) {
-        const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id});
-    }
+    // if(stocksRemaining>0) {
+    //     const response = await sellerBookUpdate({current_selling_price :req.body.min_selling_price, min_seller_row_order, max_seller_row_order, stocks_quantity: req.body.stocks_quantity, seller_id: req.body.seller_id});
+    // }
 
     return ({
         status: 200,

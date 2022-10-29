@@ -50,7 +50,7 @@ function BuyOrSell() {
           min_selling_price: orderType === 'Limit' ? PriceLim : -1,
           stocks_quantity: StockAmount
         }
-        axios.post('transaction/place/buy', data)
+        axios.post('transaction/place/sell', data)
           .then(() => {
             toast.success('Transaction Successful')
             updateAll()
