@@ -2,17 +2,14 @@ import PortfolioGraph from './PortfolioGraph';
 import './PortUserPortfolio.css';
 import axios from 'axios';
 import { useState } from 'react';
+import { useEffect } from 'react';
+import UserContext from '../../Context/UserContext';
+import { useContext } from 'react';
 
 function PortUserPortfolio() {
-  const [users, setUsers] = useState([]);
-  axios.get("/users")
-  .then((response)=>{
-    console.log(response.data);
-    setUsers(response.data);
-  })
-  .catch((err)=>{
-    console.log(err);
-  })
+  const usercontext = useContext(UserContext);
+  const {users} = usercontext;
+  
   return (
     <div className='portuserportfolio'>
       <div className="currentmarketprice">
@@ -29,7 +26,7 @@ function PortUserPortfolio() {
       </thead>
       <tbody>
         {
-          users.map(user => (
+          users.map((user) => (
             
               <tr class="table-info">
                 <td class="table-info">{user.user_name}</td>
