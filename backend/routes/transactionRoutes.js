@@ -5,7 +5,7 @@ const { getTransactionHistory, placeSellOrder  } = require('../controllers/trans
 const { placeBuyOrder  } = require('../controllers/placeBuyOrder');
 
 router.route('/history').get(getTransactionHistory);
-router.route('/place/buy').get(placeBuyOrder);
-router.route('/place/sell').get(placeSellOrder);
+router.route('/place/buy').post(placeBuyOrder);
+router.route('/place/sell').post(placeSellOrder);
 
 module.exports = router
