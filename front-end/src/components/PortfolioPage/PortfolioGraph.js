@@ -15,6 +15,23 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
           stacked: true,
           reverse: false
       }}
+      theme={{ 
+        axis: { 
+          legend: { 
+            text: { 
+              fill: "#fff" 
+            } 
+          },
+          ticks: {
+            line: {
+              stroke: "#fff"
+            },
+            text: {
+              fill:"#fff"
+            }
+          },
+        } 
+      }}
       yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}
@@ -26,7 +43,6 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
           legend: 'transactions',
           legendOffset: 36,
           legendPosition: 'middle',
-          textColor: 'white',
       }}
       axisLeft={{
           orient: 'left',
@@ -34,9 +50,8 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
           tickPadding: 5,
           tickRotation: 0,
           legend: 'market price',
-          legendOffset: -40,
+          legendOffset: -50,
           legendPosition: 'middle',
-          textColor: 'white',
       }}
       pointSize={10}
       pointColor={{ theme: 'background' }}
@@ -51,6 +66,7 @@ const MyResponsiveLine = ({ data /* see data tab */ }) => (
                   background: 'white',
                   padding: '9px 12px',
                   border: '1px solid #ccc',
+                  color: '#FD841F'
               }}
           >
               <div>Transaction Number: {point.data.x}</div>
