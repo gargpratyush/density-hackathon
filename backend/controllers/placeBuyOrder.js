@@ -14,6 +14,7 @@ const transaction_update = async (props) => {
 const sellerDeletion = async (props) => {
     let sql_query = `SELECT * FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE row_order = ${props.min_seller_row_order};`;
     var [toBeDeletedRow] = await db.execute(sql_query, []);
+
     console.log(toBeDeletedRow)
     var stocksRemaining = props.current_stock;
     var min_seller_row_order = props.min_seller_row_order;
@@ -29,6 +30,10 @@ const sellerDeletion = async (props) => {
             flag = 1;
             break;
         }
+        if (toBeDeletedRow[0].min_selling_price>props.current_buying_price){
+                flag = 1;
+                break;
+            }
         if(stocksRemaining == toBeDeletedRow[0].stocks_quantity) {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.sell_order_book WHERE sell_order_id = ${toBeDeletedRow[0].sell_order_id};`;
             await db.execute(sql_query, []);

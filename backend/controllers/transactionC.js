@@ -30,12 +30,18 @@ const buyerDeletion = async (props) => {
     var max_buyer_row_order = props.max_buyer_row_order;
     var flag = 0;
     while(stocksRemaining > 0) {
+        
+
         if(toBeDeletedRow.length === 0) {
             sql_query = `UPDATE ${process.env.MYSQLDATABASE}.limits SET max_buyer_row_order = 0, max_buying_price = -1;`;
             await db.execute(sql_query, []);
             flag = 1;
             break;
         }
+        if (toBeDeletedRow[0].max_buying_price<props.current_selling_price){
+                flag = 1;
+                break;
+            }
         if(stocksRemaining == toBeDeletedRow[0].stocks_quantity) {
             sql_query = `DELETE FROM ${process.env.MYSQLDATABASE}.buy_order_book WHERE buy_order_id = ${toBeDeletedRow[0].buy_order_id};`;
             await db.execute(sql_query, []);
